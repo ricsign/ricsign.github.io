@@ -1,5 +1,5 @@
 // Project Title
-// Your Name
+// Richard Shuai
 // Date
 //
 // Extra for Experts:
@@ -8,7 +8,8 @@
 let grid = [], gridWidth, gridHeight;
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  gridWidth = gridHeight = 5;
+  gridWidth = 5;
+  gridHeight = 4;
   initGrid();
 }
 
@@ -24,13 +25,14 @@ function initGrid(){
     grid.push([]);
     for(let j=0;j<gridHeight;++j){
       let cell = {
-        value: twox === i && twoy === j? 2:0,
+        value: twox === i && twoy === j ? 2:0,
       };
       grid[i].push(cell);
     }
   }
 }
 
+// draw the grid according to the values
 function drawGrid(){
   // start at top and left 10%, end at top 90% and left 60%, stepx is x's step length, stepy is y's step length
   let startx = width/10, starty = height/10, endx = width/5*3, endy = height/10*9;
@@ -45,5 +47,22 @@ function drawGrid(){
         text(grid[i][j].value, startx+(i+0.5)*stepx, starty+(j+0.5)*stepy);
       }
     }
+  }
+}
+
+
+function keyPressed(){
+  if(keyCode === LEFT_ARROW){
+
+  }
+  // if user goes to the right, check from the right side to the left
+  else if(keyCode === RIGHT_ARROW){
+  
+  }
+  else if(keyCode === DOWN_ARROW){
+
+  }
+  else if(keyCode === UP_ARROW){
+
   }
 }
