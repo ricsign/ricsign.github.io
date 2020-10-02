@@ -6,31 +6,26 @@
 // - describe what you did to take this project "above and beyond"
 
 
-let sudoku = [[5,3,0,0,7,0,0,0,0],
-              [5,3,0,0,7,0,0,0,0],
-              [5,3,0,0,7,0,0,0,0],
-              [5,3,0,0,7,0,0,4,0],
-              [5,3,0,0,7,0,0,0,0],
-              [5,3,9,0,7,0,1,0,0],
-              [5,3,0,0,7,0,0,0,0],
-              [5,3,0,0,8,0,0,6,0],
-              [5,3,0,0,7,0,0,0,0],
-            ];
+let sudoku;     
+let sudokuInit;
 
-            
-let sudokuInit = [[5,3,0,0,7,0,0,0,0],
-[5,3,0,0,7,0,0,0,0],
-[5,3,0,0,7,0,0,0,0],
-[5,3,0,0,7,0,0,4,0],
-[5,3,0,0,7,0,0,0,0],
-[5,3,9,0,7,0,1,0,0],
-[5,3,0,0,7,0,0,0,0],
-[5,3,0,0,8,0,0,6,0],
-[5,3,0,0,7,0,0,0,0],
-];
+function preload(){
+  sudoku = loadStrings("assets/2.txt");
+  sudokuInit = loadStrings("assets/2.txt");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  for(let i=0;i<sudoku.length;++i){
+    sudoku[i] = sudoku[i].split(" ");
+  }
+  for(let i=0;i<sudokuInit.length;++i){
+    sudokuInit[i] = sudokuInit[i].split();
+  }
+
+  // cast to number
+  // ... 
+
 }
 
 function draw() {
