@@ -5,25 +5,52 @@
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
 
-let grid = [], gridSize, containerSize, score, isGameStarted, isGameOver;
+
+// gameStatus: menu, play, gg
+// playMethod: manual, auto
+let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration;
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   initGrid();
   score = 0;
-  isGameOver = false;
-  isGameStarted = true;
+  gameStatus = "menu";
+  autoplayDuration = 500;
+  autoplayLastMoveTime = 0;
+  valueToColor = new Map([
+    [0,"white"],
+    [2,"#fafcc2"],
+    [4,"#ffd57e"],
+    [8,"#fca652"],
+    [16,"#d9adad"],
+    [32,"#eb6383"],
+    [64,"#d63447"],
+    [128,"#b2ebf2"],
+    [256,"#00bcd4"],
+    [512,"#008dd4"],
+    [1024,"#88e868"]
+  ]);
+  for(let i=0;i<15;++i){
+    valueToColor.set(2048*Math.pow(2,i),"#2e5a1c");
+  }
 }
 
 
 function draw() {
-  if(isGameStarted && !isGameOver){
+  if(gameStatus === "menu"){
+    background("#ffefa0");
+    displayMenu();
+  }
+  else if(gameStatus === "play"){
     background(200,200,235);
     drawGrid();
+    if(playMethod === "auto"){
+      autoplay();
+    }
     displayScore();
   }
-  if(isGameOver){
+  else if(gameStatus === "gg"){
     background(255,255,255);
   }
   
@@ -33,7 +60,7 @@ function draw() {
 // initGrid function sets up the grid, and randomize the first 2
 function initGrid(){
 
-  gridSize = 4;
+  gridSize = 5;
 
   // generate the first 2's x and y coordinate
   let twoX = floor(random() * gridSize);
@@ -55,6 +82,7 @@ function initGrid(){
 function drawGrid(){
   // main container
   containerSize = min(width/5*3,height/10*9);
+  fill(0,0,0);
   rect(width/20, height/20, containerSize, containerSize,20);
 
   // calculate parameters
@@ -64,10 +92,12 @@ function drawGrid(){
 
   // draw inner rectangles
   textAlign(CENTER, CENTER);
-  textSize(cellWidth * 0.55);
+  textSize(cellWidth * 0.3);
   for(let y=0;y<gridSize;++y){
     for(let x=0;x<gridSize;++x){
+      fill(valueToColor.get(grid[y][x].value));
       rect(startX+cellWidth*x, startY+cellHeight*y, cellWidth, cellHeight, 10);
+      fill(0);
       if(grid[y][x].value > 0){
         text(grid[y][x].value, startX+cellWidth*(x+0.5), startY+cellHeight*(y+0.5));
       }
@@ -77,53 +107,53 @@ function drawGrid(){
 
 
 function keyPressed(){
-  let isOneOrMoreCellMoved = false;
-  // move up
-  if(key === "w" || key === "W"){ 
-    isOneOrMoreCellMoved |= moveAllCells("w");
-    isOneOrMoreCellMoved |= mergeAllCells("w");
-    isOneOrMoreCellMoved |= moveAllCells("w");
-    checkGameOver();
-
-    if(!isGameOver && isOneOrMoreCellMoved){
-      generateRandomCell();
+  if(gameStatus === "play" && playMethod === "manual"){ 
+    // move up
+    if(key === "w" || key === "W"){ 
+      oneRound("w");
     }
-  }
-  // move down
-  if(key === "s" || key === "S"){
-    isOneOrMoreCellMoved |= moveAllCells("s");
-    isOneOrMoreCellMoved |= mergeAllCells("s");
-    isOneOrMoreCellMoved |= moveAllCells("s");
-    checkGameOver();
-
-    if(!isGameOver && isOneOrMoreCellMoved){
-      generateRandomCell();
+    // move down
+    if(key === "s" || key === "S"){
+      oneRound("s");
     }
-  }
-  // move left
-  if(key === "a" || key === "A"){
-    isOneOrMoreCellMoved |= moveAllCells("a");
-    isOneOrMoreCellMoved |= mergeAllCells("a");
-    isOneOrMoreCellMoved |= moveAllCells("a");
-    checkGameOver();
-
-    if(!isGameOver && isOneOrMoreCellMoved){
-      generateRandomCell();
+    // move left
+    if(key === "a" || key === "A"){
+      oneRound("a");
     }
-  }
-  // move right
-  if(key === "d" || key === "D"){ 
-    isOneOrMoreCellMoved |= moveAllCells("d");
-    isOneOrMoreCellMoved |= mergeAllCells("d");
-    isOneOrMoreCellMoved |= moveAllCells("d");
-    checkGameOver();
-
-    if(!isGameOver && isOneOrMoreCellMoved){
-      generateRandomCell();
+    // move right
+    if(key === "d" || key === "D"){ 
+      oneRound("d");
     }
   }
 }
 
+
+// mouse press
+function mousePressed(){
+  if(gameStatus === "menu"){
+    if(mouseX >= 50 && mouseX <= width-50 && mouseY >= 200 && mouseY <= 300){
+      gameStatus = "play";
+      playMethod = "manual";
+    }
+    if(mouseX >= 50 && mouseX <= width-50 && mouseY >= 400 && mouseY <= 500){
+      gameStatus = "play";
+      playMethod = "auto";
+    }
+  }
+}
+
+// one function takes care of one round of moving
+function oneRound(direction){
+  let isOneOrMoreCellMoved = false;
+  isOneOrMoreCellMoved |= moveAllCells(direction);
+  isOneOrMoreCellMoved |= mergeAllCells(direction);
+  isOneOrMoreCellMoved |= moveAllCells(direction);
+  checkGameOver();
+
+  if(gameStatus === "play" && isOneOrMoreCellMoved){
+    generateRandomCell();
+  }
+}
 
 // move all cells based on the direction given
 function moveAllCells(direction){
@@ -285,6 +315,7 @@ function accumulateScore(value){
 
 // display user's score, ill change the style later
 function displayScore(){
+  fill(0);
   text(score,width-200,60);
 }
 
@@ -307,8 +338,31 @@ function checkGameOver(){
       }
     }
   }
-  alert("no!!!!!!!!!");
-  isGameOver = true;
-  isGameStarted = false;
+  gameStatus = "gg";
   return true;
+}
+
+
+// display start menu
+function displayMenu(){
+  textSize(width/20);
+  textAlign(LEFT);
+  text("4096!",width/2-width/15,100);
+  rect(50,200,width-100,100);
+  textAlign(CENTER,CENTER);
+  text("Play",width/2,250);
+  rect(50,400,width-100,100);
+  text("Auto Play",width/2,450);
+}
+
+
+// autoplay
+function autoplay(){
+  if(gameStatus === "play"){
+    if(autoplayLastMoveTime + autoplayDuration < millis()){
+      let dir = random(["a","w","s","d"]);
+      oneRound(dir);
+      autoplayLastMoveTime = millis();
+    }
+  }
 }
