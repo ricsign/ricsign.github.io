@@ -1,6 +1,6 @@
 // 4096!
 // Richard Shuai
-// Date
+// Oct/02/2020
 //
 // Extra for Experts:
 // - describe what you did to take this project "above and beyond"
@@ -8,13 +8,14 @@
 
 // gameStatus: menu, play, gg
 // playMethod: manual, auto
-let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration;
+let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration, totalMoves;
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   initGrid();
   score = 0;
+  totalMoves = 0;
   gameStatus = "menu";
   autoplayDuration = 500;
   autoplayLastMoveTime = 0;
@@ -51,7 +52,7 @@ function draw() {
     displayScore();
   }
   else if(gameStatus === "gg"){
-    background(255,255,255);
+    gameOverScreen();
   }
   
 }
@@ -60,7 +61,7 @@ function draw() {
 // initGrid function sets up the grid, and randomize the first 2
 function initGrid(){
 
-  gridSize = 5;
+  gridSize = 4;
 
   // generate the first 2's x and y coordinate
   let twoX = floor(random() * gridSize);
@@ -151,6 +152,7 @@ function oneRound(direction){
   checkGameOver();
 
   if(gameStatus === "play" && isOneOrMoreCellMoved){
+    totalMoves++;
     generateRandomCell();
   }
 }
@@ -271,7 +273,7 @@ function mergeCurrentCell(x,y,up,left){
   if(grid[y-up][x-left].value === grid[y][x].value){
     grid[y][x].value *= 2;
     grid[y-up][x-left].value = 0;
-    accumulateScore(grid[y][x].value);
+    score += grid[y][x].value;
     return true;
   }
 
@@ -307,16 +309,11 @@ function generateRandomCell(){
 }
 
 
-// adds up score
-function accumulateScore(value){
-  score += value;
-}
-
-
 // display user's score, ill change the style later
 function displayScore(){
   fill(0);
   text(score,width-200,60);
+  text(totalMoves,width-200,300);
 }
 
 
@@ -365,4 +362,11 @@ function autoplay(){
       autoplayLastMoveTime = millis();
     }
   }
+}
+
+
+// game over screen
+function gameOverScreen(){
+  background(235,255,255);
+  text();
 }
