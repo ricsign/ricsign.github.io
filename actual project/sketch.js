@@ -17,7 +17,7 @@ function setup() {
   score = 0;
   totalMoves = 0;
   gameStatus = "menu";
-  autoplayDuration = 500;
+  autoplayDuration = 100;
   autoplayLastMoveTime = 0;
   valueToColor = new Map([
     [0,"white"],
@@ -50,8 +50,9 @@ function draw() {
       autoplay();
     }
     displayScore();
+    checkGameOver();
   }
-  else if(gameStatus === "gg"){
+  if(gameStatus === "gg"){
     gameOverScreen();
   }
   
@@ -60,6 +61,8 @@ function draw() {
 
 // initGrid function sets up the grid, and randomize the first 2
 function initGrid(){
+
+  grid = [];
 
   gridSize = 4;
 
@@ -110,19 +113,19 @@ function drawGrid(){
 function keyPressed(){
   if(gameStatus === "play" && playMethod === "manual"){ 
     // move up
-    if(key === "w" || key === "W"){ 
+    if(key === "w" || key === "W" || keyCode === UP_ARROW){ 
       oneRound("w");
     }
     // move down
-    if(key === "s" || key === "S"){
+    if(key === "s" || key === "S" || keyCode === DOWN_ARROW){
       oneRound("s");
     }
     // move left
-    if(key === "a" || key === "A"){
+    if(key === "a" || key === "A" || keyCode === LEFT_ARROW){
       oneRound("a");
     }
     // move right
-    if(key === "d" || key === "D"){ 
+    if(key === "d" || key === "D" || keyCode === RIGHT_ARROW){ 
       oneRound("d");
     }
   }
@@ -141,6 +144,12 @@ function mousePressed(){
       playMethod = "auto";
     }
   }
+
+  if(gameStatus === "gg"){
+    if(mouseX >= 100 && mouseX <= width-100 && mouseY >= 500 && mouseY <= 600){
+      setup();
+    }
+  }
 }
 
 // one function takes care of one round of moving
@@ -149,7 +158,7 @@ function oneRound(direction){
   isOneOrMoreCellMoved |= moveAllCells(direction);
   isOneOrMoreCellMoved |= mergeAllCells(direction);
   isOneOrMoreCellMoved |= moveAllCells(direction);
-  checkGameOver();
+  
 
   if(gameStatus === "play" && isOneOrMoreCellMoved){
     totalMoves++;
@@ -312,8 +321,8 @@ function generateRandomCell(){
 // display user's score, ill change the style later
 function displayScore(){
   fill(0);
-  text(score,width-200,60);
-  text(totalMoves,width-200,300);
+  text("Score: "+score,width-200,60);
+  text("Moves: "+totalMoves,width-200,300);
 }
 
 
@@ -335,20 +344,29 @@ function checkGameOver(){
       }
     }
   }
-  gameStatus = "gg";
-  return true;
+
+  // redirect delay
+  window.setTimeout(function(){
+    gameStatus = "gg";
+    return true;
+  }, 2000);
 }
 
 
 // display start menu
 function displayMenu(){
-  textSize(width/20);
+  textSize(width/15);
   textAlign(LEFT);
   text("4096!",width/2-width/15,100);
+  fill("white");
   rect(50,200,width-100,100);
+  textSize(width/30);
   textAlign(CENTER,CENTER);
+  fill("black");
   text("Play",width/2,250);
+  fill("white");
   rect(50,400,width-100,100);
+  fill("black");
   text("Auto Play",width/2,450);
 }
 
@@ -367,6 +385,15 @@ function autoplay(){
 
 // game over screen
 function gameOverScreen(){
+  textSize(width/15);
+  textAlign(CENTER,CENTER);
   background(235,255,255);
-  text();
+  text("Game Over!",width/2,100);
+  textSize(width/25);
+  text("Your score is "+ score, width/2,220);
+  text("Your total moves is "+ totalMoves, width/2,340);
+  fill("white");
+  rect(100,500,width-200,100);
+  fill("black");
+  text("Restart",width/2,550);
 }
