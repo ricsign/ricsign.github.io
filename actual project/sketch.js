@@ -3,22 +3,43 @@
 // Oct/02/2020
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// 1. Utilize map to store keys and values
+// 2. Move and combine is the most difficult part in this project
+// 3. Sounds and Images are used
+// 4. Every functionality is compressed into a single organized function 
+// 5. Autoplay Implemented
 
 
-// gameStatus: menu, play, gg
-// playMethod: manual, auto
-let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration, totalMoves;
+// Variables Dictionary
+// grid: contains all tiles
+// gridSize: the width and length of grid
+// containerSize: Inner square's size
+// score: user's total score
+// gameStatus: The status of the game: menu, play, gg
+// playMethod: How to play? manual, auto
+// valueToColor: a map that contains every tile and its corresponding color
+// autoplayDuration: duration of autoplay in ms
+// autoplayLastMoveTime: last move time autoplay in ms
+// totalMoves: total moves used
+// moveSound: sound plays every single move
+// menubackground, playbackground, ggbackground: background images
+
+let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration, totalMoves, moveSound, menubackground, playbackground, ggbackground;
+
+function preload(){
+  soundFormats("mp3");
+  moveSound = loadSound("assets/pop");
+  menubackground = loadImage("assets/background-1.jpg");
+  playbackground = loadImage("assets/background-2.png");
+  ggbackground = loadImage("assets/background-3.jpg");
+}
 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  initGrid();
   score = 0;
   totalMoves = 0;
   gameStatus = "menu";
-  autoplayDuration = 100;
-  autoplayLastMoveTime = 0;
   valueToColor = new Map([
     [0,"white"],
     [2,"#fafcc2"],
@@ -35,16 +56,17 @@ function setup() {
   for(let i=0;i<15;++i){
     valueToColor.set(2048*Math.pow(2,i),"#2e5a1c");
   }
+
 }
 
 
 function draw() {
   if(gameStatus === "menu"){
-    background("#ffefa0");
+    background(menubackground);
     displayMenu();
   }
   else if(gameStatus === "play"){
-    background(200,200,235);
+    background(playbackground);
     drawGrid();
     if(playMethod === "auto"){
       autoplay();
@@ -53,6 +75,7 @@ function draw() {
     checkGameOver();
   }
   if(gameStatus === "gg"){
+    background(ggbackground);
     gameOverScreen();
   }
   
@@ -63,8 +86,6 @@ function draw() {
 function initGrid(){
 
   grid = [];
-
-  gridSize = 4;
 
   // generate the first 2's x and y coordinate
   let twoX = floor(random() * gridSize);
@@ -136,12 +157,30 @@ function keyPressed(){
 function mousePressed(){
   if(gameStatus === "menu"){
     if(mouseX >= 50 && mouseX <= width-50 && mouseY >= 200 && mouseY <= 300){
+      let reGrid = /^(1[0-2]|[2-9])$/; // 2-12
+      gridSize = 0;
+      while(!reGrid.test(gridSize)){
+        gridSize = window.prompt("Please enter the grid size from 2-12:");
+      }
+      initGrid();
       gameStatus = "play";
       playMethod = "manual";
     }
     if(mouseX >= 50 && mouseX <= width-50 && mouseY >= 400 && mouseY <= 500){
+      let reGrid = /^(1[0-2]|[2-9])$/; // 2-12
+      let reAutoPlay = /^([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9])$/; //10-9999
+      gridSize = 0;
+      autoplayDuration = 0;
+      while(!reGrid.test(gridSize)){
+        gridSize = Number(window.prompt("Please enter the grid size from 2-12:"));
+      }
+      while(!reAutoPlay.test(autoplayDuration)){
+        autoplayDuration = Number(window.prompt("Please enter the auto play duration in ms from 10-9999:"));
+      }
+      initGrid();
       gameStatus = "play";
       playMethod = "auto";
+      autoplayLastMoveTime = millis();
     }
   }
 
@@ -162,6 +201,7 @@ function oneRound(direction){
 
   if(gameStatus === "play" && isOneOrMoreCellMoved){
     totalMoves++;
+    moveSound.play();
     generateRandomCell();
   }
 }
@@ -320,9 +360,18 @@ function generateRandomCell(){
 
 // display user's score, ill change the style later
 function displayScore(){
-  fill(0);
+  fill(255);
+  textSize(width/35);
   text("Score: "+score,width-200,60);
   text("Moves: "+totalMoves,width-200,300);
+  textSize(width/100);
+  text("When you start the game, there will be a two tile on the grid,", width-300,500);
+  text("You hit the arrow keys on your keyboard to move the tiles around", width-300,520);
+  text(" — and also to generate new tiles, which will also be valued at 2 or 4.", width-300,540);
+  text(" When two equal tiles collide, they combine to give you one ", width-300,560);
+  text("greater tile that displays their sum. The more you do this,", width-350,580);
+  text(" the higher the tiles get and the more crowded the board becomes.",width-400,600); 
+  text("Your objective is to reach 4096 before the board fills up. ", width-300,620);
 }
 
 
@@ -355,6 +404,7 @@ function checkGameOver(){
 
 // display start menu
 function displayMenu(){
+  fill("white");
   textSize(width/15);
   textAlign(LEFT);
   text("4096!",width/2-width/15,100);
@@ -385,13 +435,19 @@ function autoplay(){
 
 // game over screen
 function gameOverScreen(){
+  let highestTile = 0;
+  for(let y=0;y<gridSize;++y){
+    for(let x=0;x<gridSize;++x){
+      highestTile = highestTile > grid[y][x].value ? highestTile : grid[y][x].value;
+    }
+  }
   textSize(width/15);
   textAlign(CENTER,CENTER);
-  background(235,255,255);
   text("Game Over!",width/2,100);
-  textSize(width/25);
-  text("Your score is "+ score, width/2,220);
-  text("Your total moves is "+ totalMoves, width/2,340);
+  textSize(width/30);
+  text("Your score is "+ score, width/2,200);
+  text("The highest tile you got is "+ highestTile, width/2,300);
+  text("Your total moves is "+ totalMoves, width/2,400);
   fill("white");
   rect(100,500,width-200,100);
   fill("black");
