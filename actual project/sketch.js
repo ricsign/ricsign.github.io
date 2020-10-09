@@ -4,9 +4,9 @@
 //
 // Extra for Experts:
 // 1. Utilize map to store keys and values
-// 2. Move and combine is the most difficult part in this project
+// 2. Move and combine is the most difficult part in this project, and user can check the activity log in the console
 // 3. Sounds and Images are used
-// 4. Every functionality is compressed into a single organized function 
+// 4. Every functionality is encapsulated into a single organized function 
 // 5. Autoplay Implemented
 
 
@@ -23,14 +23,15 @@
 // totalMoves: total moves used
 // moveSound: sound plays every single move
 // menubackground, playbackground, ggbackground: background images
+// checkingGameOver: are we currently checking game over?
 
-let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration, totalMoves, moveSound, menubackground, playbackground, ggbackground;
+let grid = [], gridSize, containerSize, score, gameStatus, playMethod, valueToColor,autoplayLastMoveTime,autoplayDuration, totalMoves, moveSound, menubackground, playbackground, ggbackground, checkingGameOver;
 
 function preload(){
   soundFormats("mp3");
   moveSound = loadSound("assets/pop");
   menubackground = loadImage("assets/background-1.jpg");
-  playbackground = loadImage("assets/background-2.png");
+  playbackground = loadImage("assets/background-2.jpg");
   ggbackground = loadImage("assets/background-3.jpg");
 }
 
@@ -72,7 +73,9 @@ function draw() {
       autoplay();
     }
     displayScore();
-    checkGameOver();
+    if(!checkingGameOver){
+      checkGameOver();
+    }
   }
   if(gameStatus === "gg"){
     background(ggbackground);
@@ -204,6 +207,8 @@ function oneRound(direction){
     moveSound.play();
     generateRandomCell();
   }
+
+  return isOneOrMoreCellMoved;
 }
 
 // move all cells based on the direction given
@@ -307,6 +312,9 @@ function moveCurrentCell(x,y,up,left){
     currentX -= left;
   }
 
+  if(currentX !== x-left || currentY !== y-up){
+    console.log("moved a cell at (" + x + "," + y + ")");
+  }
   return currentX !== x-left || currentY !== y-up;
 }
 
@@ -323,6 +331,7 @@ function mergeCurrentCell(x,y,up,left){
     grid[y][x].value *= 2;
     grid[y-up][x-left].value = 0;
     score += grid[y][x].value;
+    console.log("merged two cells at ("+ x + ","+ y + "), created a cell with value of " + grid[y][x].value);
     return true;
   }
 
@@ -355,6 +364,7 @@ function generateRandomCell(){
   }
 
   grid[selectedY][selectedX].value = selectedValue;
+  console.log("generated a new cell with value of "+selectedValue+" at ("+selectedX + "," + selectedY + ")");
 }
 
 
@@ -370,23 +380,27 @@ function displayScore(){
   text(" — and also to generate new tiles, which will also be valued at 2 or 4.", width-300,540);
   text(" When two equal tiles collide, they combine to give you one ", width-300,560);
   text("greater tile that displays their sum. The more you do this,", width-350,580);
-  text(" the higher the tiles get and the more crowded the board becomes.",width-400,600); 
+  text("the higher the tiles get and the more crowded the board becomes.",width-400,600); 
   text("Your objective is to reach 4096 before the board fills up. ", width-300,620);
+  text("You can check console to check your activities log.", width-300,640);
 }
 
 
 // the game is over is the grid is full and no adjcent values are the same
 function checkGameOver(){
+  checkingGameOver = true;
   let dir = [-1,0,1,0,-1];
   for(let y=0;y<gridSize;++y){
     for(let x=0;x<gridSize;++x){
       if(grid[y][x].value === 0){
+        checkingGameOver = false;
         return false; 
       }
       else{
         // check all four directions
         for(let i=0;i<4;++i){
           if(y+dir[i] >= 0 && y+dir[i] < gridSize && x+dir[i+1] >= 0 && x+dir[i+1] < gridSize && grid[y+dir[i]][x+dir[i+1]].value === grid[y][x].value){
+            checkingGameOver = false;
             return false; // found one same adjcent cell!
           }
         }
@@ -396,9 +410,11 @@ function checkGameOver(){
 
   // redirect delay
   window.setTimeout(function(){
+    checkingGameOver = false;
     gameStatus = "gg";
     return true;
-  }, 2000);
+  }, 1000);
+  checkingGameOver = false;
 }
 
 
@@ -426,8 +442,9 @@ function autoplay(){
   if(gameStatus === "play"){
     if(autoplayLastMoveTime + autoplayDuration < millis()){
       let dir = random(["a","w","s","d"]);
-      oneRound(dir);
-      autoplayLastMoveTime = millis();
+      if(oneRound(dir)){
+        autoplayLastMoveTime = millis();
+      }
     }
   }
 }
@@ -441,6 +458,7 @@ function gameOverScreen(){
       highestTile = highestTile > grid[y][x].value ? highestTile : grid[y][x].value;
     }
   }
+
   textSize(width/15);
   textAlign(CENTER,CENTER);
   text("Game Over!",width/2,100);
