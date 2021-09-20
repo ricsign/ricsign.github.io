@@ -9,7 +9,7 @@
 // energy saving lvl 1: complete visual simulation
 // energy saving lvl 2: partial visual simulation
 // energy saving lvl 3: no visual simulation
-let screenWidth = 1200, screenHeight = 800, groundLevel = 650, timeSteps = 1000, energySavingLevel = 1, counter, blockArr, bg, blockImgs;
+let screenWidth = 1200, screenHeight = 800, groundLevel = 650, timeSteps = 1000, energySavingLevel, counter, blockArr, bg, blockImgs, numBlocks, popSound, isPoping;
 
 class Block{
   constructor(x, vx, mass){
@@ -35,6 +35,7 @@ class Block{
     if(this.x < 0){
       this.vx = 0-this.vx;
       counter++;
+      isPoping = true;
     }
     this.x += this.vx/timeSteps; 
   }
@@ -57,6 +58,39 @@ class Block{
 }
 
 
+function setupBlocks(){
+  // energySavingLevel = parseInt(prompt("Enter the energy saving level (1,2,3), 1 being complete visual simulation, 2 being partial visual simulation, 3 being no visual simulation. It's recommended enter at least 2 for mass >= 10^4.5, 3 for mass >= 10^6"));
+  numBlocks = parseInt(prompt("Enter the number of blocks, either 2, 3, or 4"));
+  blockArr = [];
+
+  if(numBlocks < 2 || numBlocks > 4){
+    blockArr = [new Block(100,0,1), new Block(500,-3,100)];
+    return;
+  }
+
+  let accumulatedPos = 400/(numBlocks*numBlocks), maxMass = 0;
+
+  for(let i=0;i<numBlocks;++i){
+    let curBlockMass = parseFloat(prompt("Enter the mass of block "+(i+1)+", 1 <= mass <= 10^9, this value >= the previous value"));
+    maxMass = Math.max(maxMass,curBlockMass);
+    if(i === numBlocks-1){
+      blockArr.push(new Block(accumulatedPos,-2,curBlockMass));
+    } else{
+      blockArr.push(new Block(accumulatedPos,0,curBlockMass));
+    }
+    accumulatedPos += 400/(numBlocks*numBlocks)+(60*Math.log10(curBlockMass+3)+5);
+  }
+
+  if(maxMass > Math.pow(10,7)){
+    energySavingLevel = 3;
+  }  else if(maxMass > 80000 || numBlocks === 4){
+    energySavingLevel = 2;
+  } else energySavingLevel = 1;
+
+  timeSteps = max(1000,maxMass) / 100;
+
+}
+
 function simulate(){
   for(let i=blockArr.length-1;i>=0;i--){
     for(let j=i-1;j>=0;--j){
@@ -66,29 +100,31 @@ function simulate(){
         const jNewVx = blockArr[j].getNewVx(blockArr[i]);
         blockArr[i].vx = iNewVx;
         blockArr[j].vx = jNewVx;
+        isPoping = true;
       }
     }
     blockArr[i].update();
     blockArr[i].show();
-    // if(blockArr[i].isVanished()){
-    //   blockArr.splice(i,1);
-    // }
+    if(blockArr[i].isVanished()){
+      blockArr.splice(i,1);
+    }
   }
 }
 
 function preload(){
-  bg = loadImage('../assets/bg.jpg');
+  // popSound = loadSound('../assets/pop.wav');
+  bg = loadImage('assets/bg.jpg');
   blockImgs = [];
   for(let i=1;i<=10;++i){
-    blockImgs.push(loadImage('../assets/blockimg'+i+'.png'));
+    blockImgs.push(loadImage('assets/blockimg'+i+'.png'));
   }
 }
 
 function setup() {
   // frameRate(10);
+  setupBlocks();
   createCanvas(screenHeight,screenWidth);
   counter = 0;
-  blockArr = [new Block(100,0,1), new Block(300,-2,100)];
 }
 
 function draw() {
@@ -98,5 +134,7 @@ function draw() {
   text(""+counter, 0, 0,10);
   rect(0,groundLevel,screenWidth,screenHeight-groundLevel);
   fill(255);
+  // isPoping = false;
   for(let i=0;i<timeSteps;++i) simulate();
+  // if(isPoping) popSound.play();
 }
