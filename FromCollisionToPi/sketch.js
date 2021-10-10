@@ -1,15 +1,12 @@
 // From Collision To Pi
 // Richard Shuai
 // Oct 2021
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
 
 // time step must be correctly configured for estimating more digits of pi
 // energy saving lvl 1: complete visual simulation
 // energy saving lvl 2: partial visual simulation
 // energy saving lvl 3: no visual simulation
-let screenWidth = 1200, screenHeight = 800, groundLevel = 650, timeSteps = 1000, energySavingLevel, counter, blockArr, bg, blockImgs, numBlocks, popSound, isPoping;
+let screenWidth = 1200, screenHeight = 800, groundLevel = 650, timeSteps = 1000, energySavingLevel, counter, blockArr, bg, blockImgs, numBlocks;
 
 class Block{
   constructor(x, vx, mass){
@@ -31,19 +28,21 @@ class Block{
     }
   }
 
+  // update the velocity and update the counter
   update(){
     if(this.x < 0){
       this.vx = 0-this.vx;
       counter++;
-      isPoping = true;
     }
     this.x += this.vx/timeSteps; 
   }
 
+  // check if the block is collide with another block
   isCollided(anotherBlock){
     return !(this.x + this.width < anotherBlock.x || this.x > anotherBlock.x+anotherBlock.width);
   }
 
+  // check if the block is out of the screen width
   isVanished(){
     return this.x > screenWidth;
   }
@@ -63,16 +62,19 @@ function setupBlocks(){
   numBlocks = parseInt(prompt("Enter the number of blocks, either 2, 3, or 4"));
   blockArr = [];
 
+  // user input incorrrect number of blocks
   if(numBlocks < 2 || numBlocks > 4){
     blockArr = [new Block(100,0,1), new Block(500,-3,100)];
     return;
   }
 
-  let accumulatedPos = 400/(numBlocks*numBlocks), maxMass = 0;
+  // adding blocks
+  let accumulatedPos = 400/(numBlocks*numBlocks), maxMass = 0, minMass = Math.pow(10,20);
 
   for(let i=0;i<numBlocks;++i){
     let curBlockMass = parseFloat(prompt("Enter the mass of block "+(i+1)+", 1 <= mass <= 10^9, this value >= the previous value"));
     maxMass = Math.max(maxMass,curBlockMass);
+    minMass = Math.min(minMass,curBlockMass);
     if(i === numBlocks-1){
       blockArr.push(new Block(accumulatedPos,-2,curBlockMass));
     } else{
@@ -81,35 +83,40 @@ function setupBlocks(){
     accumulatedPos += 400/(numBlocks*numBlocks)+(60*Math.log10(curBlockMass+3)+5);
   }
 
-  if(maxMass > Math.pow(10,7)){
+  // setting energy saving level automatically
+  if(maxMass/minMass > Math.pow(10,7)){
     energySavingLevel = 3;
-  }  else if(maxMass > 80000 || numBlocks === 4){
+  }  else if(maxMass/minMass > 80000 || numBlocks === 4){
     energySavingLevel = 2;
   } else energySavingLevel = 1;
 
-  timeSteps = max(1000,maxMass) / 100;
+  timeSteps = max(1000,maxMass/minMass) / 100;
 
 }
 
+
 function simulate(){
+  // simulation process
   for(let i=blockArr.length-1;i>=0;i--){
-    for(let j=i-1;j>=0;--j){
-      if(blockArr[i].isCollided(blockArr[j])){
-        counter++;
-        const iNewVx = blockArr[i].getNewVx(blockArr[j]);
-        const jNewVx = blockArr[j].getNewVx(blockArr[i]);
-        blockArr[i].vx = iNewVx;
-        blockArr[j].vx = jNewVx;
-        isPoping = true;
-      }
+    // j is the adjacent block to check if two blocks collide
+    let j = Math.max(0,i-1);
+    if(i !== j && blockArr[i].isCollided(blockArr[j])){
+      counter++;
+      const iNewVx = blockArr[i].getNewVx(blockArr[j]);
+      const jNewVx = blockArr[j].getNewVx(blockArr[i]);
+      blockArr[i].vx = iNewVx;
+      blockArr[j].vx = jNewVx;
+      isPoping = true;
     }
     blockArr[i].update();
     blockArr[i].show();
-    if(blockArr[i].isVanished()){
-      blockArr.splice(i,1);
-    }
+    // before mathematical proof, this is not definitive
+    // if(blockArr[i].isVanished()){
+    //   blockArr.splice(i,1);
+    // }
   }
 }
+
 
 function preload(){
   // popSound = loadSound('../assets/pop.wav');
@@ -120,12 +127,14 @@ function preload(){
   }
 }
 
+
 function setup() {
   // frameRate(10);
   setupBlocks();
   createCanvas(screenHeight,screenWidth);
   counter = 0;
 }
+
 
 function draw() {
   image(bg, 0, 0, screenWidth, groundLevel);
