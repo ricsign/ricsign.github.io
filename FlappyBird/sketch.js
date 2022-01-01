@@ -137,7 +137,7 @@ function keyPressed(){
 }
 
 
-function mouseClicked(){
+function touchStarted(){
   if(gameStatus === "ready") gameStatus = "playing";
   else if(gameStatus === "playing") bird.up();
   else if(gameStatus === "over") setup();

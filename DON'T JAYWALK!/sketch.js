@@ -114,7 +114,7 @@ function keyPressed() {
 	}
 }
 
-function mouseClicked(){
+function touchStarted(){
 	if(gameStatus === "playing") moveForward();
 	else if(gameStatus === "over") setup();
 }
