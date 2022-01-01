@@ -114,6 +114,11 @@ function keyPressed() {
 	}
 }
 
+function mouseClicked(){
+	if(gameStatus === "playing") moveForward();
+	else if(gameStatus === "over") setup();
+}
+
 function setup() {
 	carTypetoColor = {
 		0: color(91, 245, 83),

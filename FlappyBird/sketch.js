@@ -136,6 +136,14 @@ function keyPressed(){
   }
 }
 
+
+function mouseClicked(){
+  if(gameStatus === "ready") gameStatus = "playing";
+  else if(gameStatus === "playing") bird.up();
+  else if(gameStatus === "over") setup();
+}
+
+
 function setup() {
   screenX = 600;
   screenY = 800;
