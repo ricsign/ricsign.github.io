@@ -1,0 +1,94 @@
+body {
+    background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSj29P7NfLsP0yuMy07pJ7tBwC6A3oXDJzpQ&usqp=CAU");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    font-family: 'Nunito Sans', sans-serif;
+}
+
+.tile {
+    border: #242F9B 8px groove;
+    width: 200px;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    perspective: 1000px;
+    transition: 0.8s;
+}
+
+.hidden {
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Question_mark_%28black%29.svg/800px-Question_mark_%28black%29.svg.png");
+}
+
+.ab {
+    background-image: url("ab.jpeg");
+}
+
+.bc {
+    background-image: url("bc.jpeg");
+}
+
+.can {
+    background-image: url("can.jpeg");
+}
+
+.can2 {
+    background-image: url("can2.jpeg");
+}
+
+.can3 {
+    background-image: url("can3.jpg");
+}
+
+.can4 {
+    background-image: url("can4.jpeg");
+}
+
+.lab {
+    background-image: url("lab.jpeg");
+}
+
+.mb {
+    background-image: url("mb.jpeg");
+}
+
+.nb {
+    background-image: url("nb.jpeg");
+}
+
+.nl {
+    background-image: url("nl.jpeg");
+}
+
+.ns {
+    background-image: url("ns.jpeg");
+}
+
+.nu {
+    background-image: url("nu.jpg");
+}
+
+.nw {
+    background-image: url("nw.jpeg");
+}
+
+.on {
+    background-image: url("on.jpeg");
+}
+
+.pe {
+    background-image: url("pe.jpeg");
+}
+
+.qc {
+    background-image: url("qc.jpeg");
+}
+
+.sk {
+    background-image: url("sk.jpeg");
+}
+
+.yk {
+    background-image: url("yk.jpeg");
+}
