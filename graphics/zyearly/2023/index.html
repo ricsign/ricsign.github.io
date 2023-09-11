@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+<style>
+    html {
+        box-sizing: border-box;
+    }
+
+    html *,
+    html *:before,
+    html *:after {
+        box-sizing: inherit;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        font-size: 62.5%;
+        background-color: #121212;
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .solar-system {
+        position: relative;
+        width: 100%;
+        max-width: 700px;
+        padding-top: 100%;
+        right: 0;
+        bottom: 0;
+        transition: all 1.5s ease 0s;
+    }
+
+    .solar-system.top-pos {
+        bottom: -45%;
+        transition: all 1.5s ease 0s;
+    }
+
+    .solar-system.bot-pos {
+        bottom: 45%;
+        transition: all 1.5s ease 0s;
+    }
+
+    .solar-system.right-pos {
+        right: 50%;
+        transition: all 1.5s ease 0s;
+    }
+
+    .solar-system.left-pos {
+        right: -50%;
+        transition: all 1.5s ease 0s;
+    }
+
+    @media (min-width: 700px) {
+        .solar-system {
+            padding-top: 700px;
+        }
+    }
+
+    /*** ORBITS ***/
+
+    .orbit {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border: 2px dotted rgb(84 84 84 / 15%);
+        border-radius: 100%;
+        transform: translate(-50%, -50%);
+    }
+
+    .orbit-sun {
+        width: calc(50%);
+        height: calc(50%);
+        border: 1px dotted #ff6600;
+        background: #ffcc00;
+    }
+
+    .orbit-sun:before {
+        content: "";
+        background: #ff660017;
+        width: 99%;
+        height: 99%;
+        display: block;
+        margin-left: 0.5%;
+        margin-top: 0.5%;
+        border-radius: 100%;
+        box-shadow: 0 0 10em 5em #ff66006b, 0 0 100px 50px #ff66006b inset,
+            0 0 10px 5px #ffcc00f2;
+    }
+
+    .orbit.orbit-sun:after {
+        content: "SUN";
+        color: #ffa200;
+        top: 50%;
+        position: absolute;
+        left: -3.5em;
+        transition: left 1s ease 0s;
+    }
+
+    .solar-system.right-pos .orbit-sun:after {
+        left: calc(3.5em + 350px);
+        transition: left 1s ease 0s;
+    }
+
+    .orbit-mercury {
+        width: calc(100%);
+        height: calc(100%);
+        transform: translate(-50%, -50%);
+    }
+
+    .orbit-venus {
+        width: calc(150%);
+        height: calc(150%);
+        transform: translate(-50%, -50%);
+    }
+
+    .orbit-earth {
+        width: calc(200%);
+        height: calc(200%);
+        /* transform: translate(-50%, -50%) rotate(-10deg) !important; */
+    }
+
+    .orbit-earth:after {
+        content: "";
+        border: 2px solid red;
+        width: 1em;
+        height: 1em;
+        display: block;
+        position: relative;
+        border-color: #54cbeb #54cbeb transparent transparent;
+        transform: rotate(-50deg);
+        border-width: 2px 2px 0 0;
+        top: 52.75%;
+        left: -0.5em;
+        animation: blinker 2s linear infinite;
+    }
+
+    .orbit-mars {
+        width: calc(280%);
+        height: calc(280%);
+        transform: translate(-50%, -50%);
+    }
+
+    .orbit-asteroids {
+        width: calc(380%);
+        height: calc(380%);
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    /*** PLANETS ***/
+
+    .planet {
+        position: absolute;
+        top: 50%;
+        border-radius: 100%;
+        opacity: 0;
+        transform: translateY(-50%);
+        transition: opacity 0s ease 0s;
+    }
+
+    .planet-mercury {
+        left: -6px;
+        width: 10px;
+        height: 10px;
+        transition-duration: 1s;
+        background: #bcc1c9;
+    }
+
+    .planet-venus {
+        left: -8px;
+        width: 14px;
+        height: 14px;
+        transition-duration: 2s;
+        background: #ec5f24;
+    }
+
+    .planet-earth {
+        left: -13px;
+        width: 24px;
+        height: 24px;
+        transition-duration: 3s;
+        z-index: 1;
+    }
+
+    .planet-mars {
+        left: -9px;
+        width: 18px;
+        height: 18px;
+        transition-duration: 4s;
+        background: #d83e3c;
+    }
+
+    .planet-asteroids {
+        left: -40px;
+        width: calc(100% + 80px);
+        height: 1700px;
+        transition: all 5s ease 0s;
+    }
+
+    .planet-mercury:before {
+        content: "MERCURY";
+        color: #bcc1c9;
+        margin-left: 15px;
+        top: 0px;
+        position: absolute;
+        height: 10px;
+        line-height: 10px;
+    }
+
+    .planet-venus:before {
+        content: "VENUS";
+        color: #ec5f24;
+        margin-left: 21px;
+        top: 1px;
+        position: absolute;
+        height: 14px;
+        line-height: 14px;
+    }
+
+    .planet-earth:before {
+        content: "EARTH";
+        color: #54cbeb;
+        margin-left: 29px;
+        top: 1px;
+        position: absolute;
+        height: 24px;
+        line-height: 24px;
+    }
+
+    .planet-mars:before {
+        content: "MARS";
+        color: #d83e3c;
+        margin-left: 23px;
+        top: 1px;
+        position: absolute;
+        height: 18px;
+        line-height: 18px;
+    }
+
+    .planet-asteroids:before,
+    .planet-asteroids:after {
+        content: "ASTEROID BELT";
+        color: #666666;
+        margin-left: 8em;
+        top: 36.75%;
+        position: absolute;
+    }
+
+    .planet-asteroids:after {
+        right: 8em;
+    }
+
+    .planet-asteroids img+img {
+        position: absolute;
+        right: 0;
+        transform: rotate(180deg);
+    }
+
+    .planet-mars:after,
+    .planet-venus:after,
+    .planet-mercury:after,
+    .planet-earth:after {
+        content: "";
+        background: linear-gradient(105deg,
+                rgba(0, 0, 0, 1),
+                rgba(0, 0, 0, 0.6),
+                transparent,
+                transparent);
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+        box-shadow: 0 0 3px 2px #ffffff26;
+        opacity: 0.8;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .planet-earth:after {
+        box-shadow: 0 0 5px 3px #54cbeb5c;
+    }
+
+    .planet img {
+        width: 100%;
+    }
+
+    .planet-asteroids img {
+        width: initial;
+    }
+
+    /*** SELECTED DAYS ***/
+
+    .new-year-line,
+    .winter-solstice-line,
+    .spring-equinox-line,
+    .summer-solstice-line,
+    .autumn-equinox-line {
+        width: 12em;
+        border-bottom: 2px dotted white;
+        position: absolute;
+        left: -13.35em;
+        top: 50%;
+        z-index: -1;
+        color: white;
+        margin-top: -13px;
+        margin-left: -50%;
+        height: 14px;
+        line-height: 1em;
+    }
+
+    .new-year-line:after,
+    .winter-solstice-line:after,
+    .spring-equinox-line:after,
+    .summer-solstice-line:after,
+    .autumn-equinox-line:after {
+        content: "";
+        width: 28px;
+        height: 28px;
+        display: block;
+        float: right;
+        position: absolute;
+        background: #ffffff00;
+        right: -28px;
+        top: -1px;
+        border: 2px dotted #fff;
+        border-radius: 100%;
+    }
+
+    .winter-solstice-line {
+        margin-top: 120px;
+        left: -12.05em;
+    }
+
+    .spring-equinox-line {
+        top: -47.25%;
+        left: 58.35%;
+    }
+
+    .summer-solstice-line {
+        top: 30.35%;
+        left: 178.75%;
+    }
+
+    .autumn-equinox-line {
+        top: 148.5%;
+        left: 97.5%;
+    }
+
+    #cronoNewYear,
+    #cronoWinterSolstice,
+    #cronoSpringEquinox,
+    #cronoSummerSolstice,
+    #cronoAutumnEquinox {
+        left: 0;
+        position: absolute;
+        color: #fff;
+        width: 100%;
+        bottom: -17px;
+        font-size: 1.1em;
+    }
+
+    #cronoNewYear span,
+    #cronoWinterSolstice span,
+    #cronoSpringEquinox span,
+    #cronoSummerSolstice span,
+    #cronoAutumnEquinox span {
+        font-size: 0.75em;
+        color: #666;
+    }
+
+    /*** WARNING ***/
+
+    #warning {
+        position: fixed;
+        left: 2em;
+        bottom: 2em;
+        background: rgb(0 0 0 / 0.75);
+        height: 5em;
+        width: 45em;
+        font-size: 1.35em;
+        color: #ffa200;
+        z-index: 3;
+        text-transform: uppercase;
+        padding: 0;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #warning:before {
+        content: " ! ";
+        z-index: 2;
+        font-size: 1.9em;
+        margin-left: 1.15em;
+        color: #ffa200;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    #warning:after {
+        content: "";
+        background: #ffa200;
+        position: absolute;
+        left: 0;
+        width: 5em;
+        height: 5em;
+        z-index: 0;
+    }
+
+    #warning p {
+        display: block !important;
+        float: left;
+        width: 100%;
+        margin: 0 !important;
+        padding-left: 2.5em;
+    }
+
+    #warning p:before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        border: 1.75em solid transparent;
+        border-bottom: 2.85em solid #040404;
+        left: 0.775em;
+        top: -0.75em;
+    }
+
+    #reload {
+        background: rgb(255 162 0);
+        border: 0;
+        border-radius: 1px;
+        padding: 0.5em 0.75em;
+        margin-left: 1.5em;
+        cursor: pointer;
+        outline: none;
+    }
+
+    #reload:hover {
+        background: #54cbeb;
+    }
+
+    /* ARROWS */
+    .arrows {
+        position: fixed;
+        left: 0;
+        top: 0px;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .arrows span {
+        background: #ffffff;
+        padding: 0.5em !important;
+        position: absolute;
+        cursor: pointer;
+        margin: 1em;
+        width: 3em;
+        height: 3em;
+        border-radius: 2px;
+        text-align: center;
+        line-height: 2em;
+        opacity: 0.05;
+        box-shadow: 0 0 3px -2px #000;
+        transition: all 0.4s ease 0s;
+    }
+
+    .arrows span:hover {
+        opacity: 0.9;
+    }
+
+    .arrows span:before {
+        content: "";
+        border: 4px solid #121212;
+        width: 1.35em;
+        height: 1.35em;
+        float: left;
+        border-left-width: 0;
+        border-bottom-width: 0;
+        transform: rotate(-45deg);
+        margin-left: 0.3em;
+        margin-top: 0.6em;
+        border-radius: 3px;
+    }
+
+    .arrows span#down:before {
+        transform: rotate(135deg);
+        margin-top: 0;
+    }
+
+    .arrows span#right:before {
+        transform: rotate(45deg);
+        margin-left: 0.1em;
+        margin-top: 0.35em;
+    }
+
+    .arrows span#left:before {
+        transform: rotate(-135deg);
+        margin-top: 0.3em;
+        margin-left: 0.5em;
+    }
+
+    .arrows span#up,
+    .arrows span#down {
+        left: calc(50% - 2.5em);
+    }
+
+    .arrows span#down {
+        bottom: 0;
+    }
+
+    .arrows span#right,
+    .arrows span#left {
+        bottom: calc(50% - 2.5em);
+    }
+
+    .arrows span#right {
+        left: calc(100% - 5em);
+    }
+
+    .arrows span.active {
+        opacity: 0.9;
+    }
+
+    /* ANIMATIONS */
+
+    @keyframes blinker {
+        0% {
+            opacity: 0;
+            top: 52.85%;
+        }
+
+        40% {
+            opacity: 1;
+            top: 51%;
+        }
+
+        50% {
+            opacity: 0;
+            top: 51%;
+        }
+
+        60% {
+            opacity: 1;
+            top: 51%;
+        }
+
+        100% {
+            opacity: 0;
+            top: 48.25%;
+        }
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(-360deg);
+        }
+    }
+</style>
+
+<body>
+    <div class="solar-system">
+        <div class="orbit orbit-sun"></div>
+
+        <div class="orbit orbit-mercury" id="position-mercury">
+            <div class="planet planet-mercury" id="opacity-mercury">
+                <img src="https://cdn.josetxu.com/img/planet-mercury.png" alt="mercury" />
+            </div>
+        </div>
+
+        <div class="orbit orbit-venus" id="position-venus">
+            <div class="planet planet-venus" id="opacity-venus">
+                <img src="https://cdn.josetxu.com/img/planet-venus.png" alt="venus" />
+            </div>
+        </div>
+
+        <div class="orbit orbit-earth" id="position-earth">
+            <div class="planet planet-earth" id="opacity-earth">
+                <img src="https://cdn.josetxu.com/img/planet-earth.png" alt="earth" />
+            </div>
+        </div>
+
+        <div class="orbit orbit-mars" id="position-mars">
+            <div class="planet planet-mars" id="opacity-mars">
+                <img src="https://cdn.josetxu.com/img/planet-mars.png" alt="mars" />
+            </div>
+        </div>
+
+        <div class="orbit orbit-asteroids" id="position-asteroids">
+            <div class="planet planet-asteroids" id="opacity-asteroids">
+                <img src="https://cdn.josetxu.com/img/planets-asteroid-belt.png" alt="asteroids" />
+                <img src="https://cdn.josetxu.com/img/planets-asteroid-belt.png" alt="asteroids" />
+            </div>
+        </div>
+        <div class="lines">
+            <div class="new-year-line">
+                NEW YEAR <span id="cronoNewYear"></span>
+            </div>
+            <div class="winter-solstice-line">
+                WINTER SOLSTICE <span id="cronoWinterSolstice"></span>
+            </div>
+            <div class="spring-equinox-line">
+                SPRING EQUINOX <span id="cronoSpringEquinox"></span>
+            </div>
+            <div class="summer-solstice-line">
+                SUMMER SOLSTICE <span id="cronoSummerSolstice"></span>
+            </div>
+            <div class="autumn-equinox-line">
+                AUTUMN EQUINOX <span id="cronoAutumnEquinox"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="arrows">
+        <span id="up" onclick="goUp()"></span>
+        <span id="down" onclick="goDown()"></span>
+        <span id="right" onclick="goRight()"></span>
+        <span id="left" onclick="goLeft()"></span>
+    </div>
+
+
+    <div id="warning">
+        <p>
+            it seems that the earth has gone out of its orbit...
+            <button id="reload" onclick="location.reload()">RE-ORBIT</button>
+        </p>
+    </div>
+</body>
+<script>
+    //prevent loading error
+    document.getElementById("warning").remove();
+
+    //short getElementById
+    elem = function (id) {
+        return document.getElementById(id);
+    };
+
+    //get next year
+    var nextYear = new Date().getFullYear() + 1;
+
+    //count until date
+    var newYearDate = new Date("Jan 1, " + nextYear + " 00:00:00").getTime();
+
+    //title angles
+    var todayDate = new Date().getTime();
+    /**/ //todayDate = new Date("Apr 3, 2021 00:00:00").getTime();
+    var todaySecondsLeft = (newYearDate - todayDate) / 1000;
+    var todayDays = parseInt(todaySecondsLeft / 86400);
+
+    var plaDeg = parseInt(todayDays - 365);
+    var degMax = Math.abs(plaDeg) + 15;
+    var degMin = Math.abs(plaDeg) - 15;
+
+    //planets positions
+    var randMer = Math.floor(Math.random() * (degMax - degMin + 1)) + degMin;
+    var randVen = Math.floor(Math.random() * (degMax - degMin + 1)) + degMin;
+    var randMar = Math.floor(Math.random() * (degMax - degMin + 1)) + degMin;
+    var style = document.createElement("style");
+    style.innerHTML =
+        ".orbit-mercury {transform: translate(-50%, -50%) rotate(" +
+        randMer +
+        "deg)} .orbit-venus {transform: translate(-50%, -50%) rotate(" +
+        randVen +
+        "deg)} .orbit-mars {transform: translate(-50%, -50%) rotate(" +
+        randMar +
+        "deg)} .planet-mercury {transform:rotate(-" +
+        randMer +
+        "deg)} .planet-venus {transform:rotate(-" +
+        randVen +
+        "deg)} .planet-mars {transform:rotate(-" +
+        randMar +
+        "deg)} .planet-earth {transform:rotate(" +
+        parseInt(todayDays - 365) +
+        "deg)} .planet-venus {transform:rotate(-" +
+        randVen +
+        "deg)} ";
+    document.head.appendChild(style);
+
+    /*screen position*/
+    function qSel(sel) {
+        return document.querySelector(sel);
+    }
+    var screenPos = qSel(".solar-system").classList;
+    if (todayDays < 367) {
+        screenPos.add("left-pos");
+    }
+    if (todayDays < 335) {
+        screenPos.add("top-pos");
+    }
+    if (todayDays < 280) {
+        screenPos.remove("left-pos");
+    }
+    if (todayDays < 230) {
+        screenPos.add("right-pos");
+    }
+    if (todayDays < 185) {
+        screenPos.remove("top-pos");
+    }
+    if (todayDays < 158) {
+        screenPos.add("bot-pos");
+    }
+    if (todayDays < 120) {
+        screenPos.remove("right-pos");
+    }
+    if (todayDays < 60) {
+        screenPos.add("left-pos");
+    }
+    if (todayDays < 30) {
+        screenPos.remove("bot-pos");
+    }
+
+    /*arrows*/
+    function goUp() {
+        arrowOn("up");
+        if (screenPos.contains("bot-pos")) {
+            screenPos.remove("bot-pos");
+        } else {
+            screenPos.add("top-pos");
+        }
+    }
+
+    function goDown() {
+        arrowOn("down");
+        if (screenPos.contains("top-pos")) {
+            screenPos.remove("top-pos");
+        } else {
+            screenPos.add("bot-pos");
+        }
+    }
+
+    function goRight() {
+        arrowOn("right");
+        if (screenPos.contains("left-pos")) {
+            screenPos.remove("left-pos");
+        } else {
+            screenPos.add("right-pos");
+        }
+    }
+
+    function goLeft() {
+        arrowOn("left");
+        if (screenPos.contains("right-pos")) {
+            screenPos.remove("right-pos");
+        } else {
+            screenPos.add("left-pos");
+        }
+    }
+
+    function arrowOn(id) {
+        elem(id).classList.add("active");
+        setTimeout(function () {
+            elem(id).classList.remove("active");
+        }, 1000);
+    }
+
+    //detecting arrow key presses
+    document.addEventListener("keydown", function (e) {
+        switch (e.keyCode) {
+            case 37:
+                goLeft();
+                break;
+            case 38:
+                goUp();
+                break;
+            case 39:
+                goRight();
+                break;
+            case 40:
+                goDown();
+                break;
+        }
+    });
+
+    //countdown vars
+    var days, hours, minutes, seconds;
+
+    //countdown interval
+    var countDown = setInterval(function () {
+        var rightNow = new Date().getTime();
+        /**/ //rightNow = new Date("Apr 3, 2021 00:00:00").getTime();
+        var timeTo = newYearDate - rightNow;
+
+        days = Math.floor(timeTo / (1000 * 60 * 60 * 24));
+        hours = Math.floor((timeTo % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        minutes = Math.floor((timeTo % (1000 * 60 * 60)) / (1000 * 60));
+        seconds = Math.floor((timeTo % (1000 * 60)) / 1000);
+
+        if (hours < 10) hours = "0" + hours;
+        if (minutes < 10) minutes = "0" + minutes;
+        if (seconds < 10) seconds = "0" + seconds;
+
+        /*new year*/
+        var newYearDays;
+        if (days < 0) {
+            elem("cronoNewYear").style.display = "none";
+            newYearDays = days.toString().substr(1);
+        } else {
+            newYearDays = "-" + days;
+        }
+        elem("cronoNewYear").innerHTML =
+            days +
+            " <span>DAYS</span> &nbsp;" +
+            hours +
+            ":" +
+            minutes +
+            ":" +
+            seconds +
+            " <span>LEFT</span>";
+
+        /*leap year*/
+        var leapYear = new Date().getFullYear();
+        if ((leapYear % 4 == 0 && leapYear % 100 != 0) || leapYear % 400 == 0) {
+            rotationDeg = newYearDays * 0.9836065573770491;
+        } else {
+            rotationDeg = newYearDays * 0.9863013698630136;
+        }
+
+        /*earth position*/
+        elem("position-earth").style.transform =
+            "translate(-50%, -50%) rotate(" + rotationDeg + "deg";
+
+        /*winter solstice*/
+        var winSolsDays;
+        var wsDays = days - 11;
+        if (wsDays < 0) {
+            elem("cronoWinterSolstice").style.display = "none";
+        } else {
+            winSolsDays = wsDays;
+        }
+        elem("cronoWinterSolstice").innerHTML =
+            winSolsDays +
+            " <span>DAYS</span> &nbsp;" +
+            hours +
+            ":" +
+            minutes +
+            ":" +
+            seconds +
+            " <span>LEFT</span>";
+
+        /*spring equinox*/
+        var sprEquiDays;
+        var seDays = days - 287;
+        if (seDays < 0) {
+            elem("cronoSpringEquinox").style.display = "none";
+        } else {
+            sprEquiDays = seDays;
+        }
+        elem("cronoSpringEquinox").innerHTML =
+            sprEquiDays +
+            " <span>DAYS</span> &nbsp;" +
+            hours +
+            ":" +
+            minutes +
+            ":" +
+            seconds +
+            " <span>LEFT</span>";
+
+        /*summer solstice*/
+        var sumSolsDays;
+        var ssDays = days - 194;
+        if (ssDays < 0) {
+            elem("cronoSummerSolstice").style.display = "none";
+        } else {
+            sumSolsDays = ssDays;
+        }
+        elem("cronoSummerSolstice").innerHTML =
+            sumSolsDays +
+            " <span>DAYS</span> &nbsp;" +
+            hours +
+            ":" +
+            minutes +
+            ":" +
+            seconds +
+            " <span>LEFT</span>";
+
+        /*autumn equinox*/
+        var autEquiDays;
+        var aeDays = days - 101;
+        if (aeDays < 0) {
+            elem("cronoAutumnEquinox").style.display = "none";
+        } else {
+            autEquiDays = aeDays;
+        }
+        elem("cronoAutumnEquinox").innerHTML =
+            autEquiDays +
+            " <span>DAYS</span> &nbsp;" +
+            hours +
+            ":" +
+            minutes +
+            ":" +
+            seconds +
+            " <span>LEFT</span>";
+
+        /*initial opacity*/
+        var opacityList = document.querySelectorAll(".planet");
+        for (i = 0; i < opacityList.length; i++) {
+            opacityList[i].style.opacity = "1";
+        }
+
+        if (timeTo < 0) {
+            clearInterval(countDown);
+        }
+    }, 1000);
+</script>
+
+</html>
